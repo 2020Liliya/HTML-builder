@@ -32,8 +32,10 @@ fs.readdir(stylesPath,
         fsPromises.writeFile(cssDistPath, "");
 
         for (let style of arrStyles) {
-            const input = fs.createReadStream(path.resolve(stylesPath, style), "utf-8");
-            fsPromises.appendFile(cssDistPath, input);
+            fs.readFile(path.resolve(stylesPath, style), "utf-8", (error, fileContent) => {
+                fileContent = fileContent + '\n';
+                fsPromises.appendFile(cssDistPath, fileContent);
+            })
         }
     })
 
@@ -81,14 +83,16 @@ fs.readFile(path.resolve(__dirname, './template.html'), "utf-8", (error, fileCon
 
     let indexContent = fileContent;
 
-    for (let style of arrComponents) {
-        fs.readFile(path.resolve(componentsPath, style), 'utf8', (errComponent, fileContentComponent) => {
+    for (let component of arrComponents) {
+        fs.readFile(path.resolve(componentsPath, component), 'utf8', (errComponent, fileContentComponent) => {
             if (errComponent) throw errComponent;
-            indexContent = indexContent.replace(`{{${style.replace('.html', '')}}}`, fileContentComponent);
+            indexContent = indexContent.replace(`\{\{${component.replace('.html', '')}\}\}`, fileContentComponent);
+            
+            fsPromises.writeFile(index, "");
 
             fs.writeFile(index, indexContent, function (error) {
                 if (error) throw error;
-                console.log(`{{${style.replace('.html', '')}}}`, 'Success!');
+                console.log(`{{${component.replace('.html', '')}}}`, 'Success!');
             });
         });
     }
