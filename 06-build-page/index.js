@@ -86,13 +86,14 @@ fs.readFile(path.resolve(__dirname, './template.html'), "utf-8", (error, fileCon
     for (let component of arrComponents) {
         fs.readFile(path.resolve(componentsPath, component), 'utf8', (errComponent, fileContentComponent) => {
             if (errComponent) throw errComponent;
-            indexContent = indexContent.replace(`\{\{${component.replace('.html', '')}\}\}`, fileContentComponent);
+            let componentName = `\{\{${component.replace('.html', '')}\}\}`;
+            indexContent = indexContent.replace(componentName, fileContentComponent);
             
             fsPromises.writeFile(index, "");
 
             fs.writeFile(index, indexContent, function (error) {
                 if (error) throw error;
-                console.log(`{{${component.replace('.html', '')}}}`, 'Success!');
+                console.log(componentName, 'Success!');
             });
         });
     }
